@@ -48,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
+        centerTitle: true,
         title: Text(
           "Find Caption",
           style: styleTitle.copyWith(

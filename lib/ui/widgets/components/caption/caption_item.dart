@@ -35,7 +35,7 @@ class CaptionItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Icon(
-                        Icons.language,
+                        Icons.font_download_outlined,
                         color: primaryColor,
                       ),
                       SizedBox(
