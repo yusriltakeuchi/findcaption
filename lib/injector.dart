@@ -1,5 +1,6 @@
 
 import 'package:findcaption/core/config/api.dart';
+import 'package:findcaption/core/services/caption/caption_service.dart';
 import 'package:findcaption/core/utils/navigation/navigation_utils.dart';
 import 'package:get_it/get_it.dart';
 
@@ -13,4 +14,6 @@ void setupLocator() {
   locator.registerLazySingleton(() => NavigationUtils());
   
   /// Registering services
+  locator.registerSingleton(CaptionService());
+  
 }

@@ -1,8 +1,11 @@
+import 'package:findcaption/core/utils/dialog/dialog_utils.dart';
+import 'package:findcaption/core/viewmodels/caption/caption_provider.dart';
 import 'package:findcaption/ui/constant/constant.dart';
 import 'package:findcaption/ui/widgets/components/buttons/primary_button.dart';
 import 'package:findcaption/ui/widgets/components/textfields/custom_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -44,39 +47,127 @@ class HomeBody extends StatefulWidget {
 class _HomeBodyState extends State<HomeBody> {
   var youtubeUrlController = TextEditingController();
   var keywordController = TextEditingController();
-  bool onSearch = false;
-  void setOnSearch(bool value) {
-    setState(() {
-      onSearch = value;
-    });
+
+  void searchCaption(String from) async {
+    whenTypeKeyword(keywordController.text);
+    whenTypeYoutubeUrl(youtubeUrlController.text);
+    if (validYoutubeUrl && validKeyword) {
+      final captionProv = CaptionProvider.instance(context);
+
+      String? youtubeId = convertUrlToId(youtubeUrlController.text);
+      /// Find supported language
+      await captionProv.getCaptionLanguages(youtubeId!);
+      if (captionProv.captionLanguages!.isNotEmpty) {
+        captionProv.setSearchMode(true);
+      } else {
+        DialogShow.showInfo(
+          "This video does not contain a caption", 
+          "Caption Not Found", 
+          "OK"
+        );
+      }
+    }
   }
 
-  void searchCaption(String from) {
-    setOnSearch(true);
+  String? convertUrlToId(String url, {bool trimWhitespaces = true}) {
+    if (!url.contains("http") && (url.length == 11)) return url;
+    if (trimWhitespaces) url = url.trim();
+
+    for (var exp in [
+      RegExp(
+          r"^https:\/\/(?:www\.|m\.)?youtube\.com\/watch\?v=([_\-a-zA-Z0-9]{11}).*$"),
+      RegExp(
+          r"^https:\/\/(?:www\.|m\.)?youtube(?:-nocookie)?\.com\/embed\/([_\-a-zA-Z0-9]{11}).*$"),
+      RegExp(r"^https:\/\/youtu\.be\/([_\-a-zA-Z0-9]{11}).*$")
+    ]) {
+      Match? match = exp.firstMatch(url);
+      if (match != null && match.groupCount >= 1) return match.group(1);
+    }
+
+    return null;
+  }
+
+  bool validYoutubeUrl = true;
+  void whenTypeYoutubeUrl(String value) {
+    String patternUrl =
+        r"^((http|https)\:\/\/)?(www\.youtube\.com|youtu\.?be)\/((watch\?v=)?(.{11}))(&.*)*$";
+    if (value.isEmpty) {
+      if (validYoutubeUrl == true) {
+        setState(() {
+          validYoutubeUrl = false;
+        });
+      }
+      return;
+    } else {
+      var regex = RegExp(patternUrl);
+      if (regex.hasMatch(value)) {
+        if (validYoutubeUrl == false) {
+          setState(() {
+            validYoutubeUrl = true;
+          });
+        }
+      } else {
+        if (validYoutubeUrl == true) {
+          setState(() {
+            validYoutubeUrl = false;
+          });
+        }
+      }
+    }
+  }
+
+  bool validKeyword = true;
+  void whenTypeKeyword(String value) {
+    if (value.isEmpty) {
+      if (validKeyword == true) {
+        setState(() {
+          validKeyword = false;
+        });
+      }
+      return;
+    } else {
+      if (value.length < 3) {
+        if (validKeyword == true) {
+          setState(() {
+            validKeyword = false;
+          });
+        }
+      } else {
+        if (validKeyword == false) {
+          setState(() {
+            validKeyword = true;
+          });
+        }
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: blackColor.withOpacity(0.1),
-            blurRadius: 5,
-            spreadRadius: 4,
-            offset: const Offset(0, 2),
+    return Consumer<CaptionProvider>(
+      builder: (context, captionProv, _) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: blackColor.withOpacity(0.1),
+                blurRadius: 5,
+                spreadRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: AnimatedCrossFade(
-        firstChild: _contentEmptyWidget(), 
-        secondChild: _contentFilledWidget(), 
-        crossFadeState: onSearch == false
-          ? CrossFadeState.showFirst
-          : CrossFadeState.showSecond, 
-        duration: const Duration(milliseconds: 300),
-      ),
+          child: AnimatedCrossFade(
+            firstChild: _contentEmptyWidget(),
+            secondChild: _contentFilledWidget(),
+            crossFadeState: captionProv.searchCaptionMode == false
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            duration: const Duration(milliseconds: 300),
+          ),
+        );
+      },
     );
   }
 
@@ -140,7 +231,7 @@ class _HomeBodyState extends State<HomeBody> {
 
   Widget _fieldSubmit(String from) {
     return PrimaryButton(
-      color: primaryColor,
+      color: validKeyword && validKeyword ? primaryColor : grayColor,
       title: "Find Now",
       fontSize: 38,
       onClick: () => searchCaption(from),
@@ -148,28 +239,74 @@ class _HomeBodyState extends State<HomeBody> {
   }
 
   Widget _fieldYoutubeUrl({Function? onEditComplete}) {
-    return CustomTextField(
-      hintText: "Youtube URL (ex: https://www.youtube.com/watch?)",
-      action: TextInputAction.next,
-      type: TextInputType.text,
-      controller: youtubeUrlController,
-      hintColor: blackColor.withOpacity(0.5),
-      useBoldText: false,
-      fontSize: 38,
-      onEditComplete: onEditComplete,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomTextField(
+          hintText: "Youtube URL (ex: https://www.youtube.com/watch?)",
+          action: TextInputAction.next,
+          type: TextInputType.text,
+          controller: youtubeUrlController,
+          hintColor: blackColor.withOpacity(0.5),
+          useBoldText: false,
+          fontSize: 38,
+          onEditComplete: onEditComplete,
+          onChange: (value) => whenTypeYoutubeUrl(value),
+        ),
+        validYoutubeUrl == false
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: setHeight(10),
+                  ),
+                  Text(
+                    "Youtube URL is not valid",
+                    style: styleSubtitle.copyWith(
+                      fontSize: setFontSize(30),
+                      color: redColor,
+                    ),
+                  ),
+                ],
+              )
+            : const SizedBox()
+      ],
     );
   }
 
   Widget _fieldKeyword({Function? onEditComplete}) {
-    return CustomTextField(
-      hintText: "Keyword",
-      action: TextInputAction.done,
-      type: TextInputType.text,
-      controller: keywordController,
-      hintColor: blackColor.withOpacity(0.5),
-      useBoldText: false,
-      fontSize: 38,
-      onEditComplete: onEditComplete,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomTextField(
+          hintText: "Keyword",
+          action: TextInputAction.done,
+          type: TextInputType.text,
+          controller: keywordController,
+          hintColor: blackColor.withOpacity(0.5),
+          useBoldText: false,
+          fontSize: 38,
+          onEditComplete: onEditComplete,
+          onChange: (value) => whenTypeKeyword(value),
+        ),
+        validKeyword == false
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: setHeight(10),
+                  ),
+                  Text(
+                    "Keywords minimum 3 characters",
+                    style: styleSubtitle.copyWith(
+                      fontSize: setFontSize(30),
+                      color: redColor,
+                    ),
+                  ),
+                ],
+              )
+            : const SizedBox()
+      ],
     );
   }
 }

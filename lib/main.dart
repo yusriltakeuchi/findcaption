@@ -41,39 +41,42 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
-    return MaterialApp(
-      navigatorKey: locator<NavigationUtils>().navigatorKey,
-      title: 'Find Caption',
-      debugShowCheckedModeBanner: false,
-      builder: (context, child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0), //set desired text scale factor here
-          child: ScrollConfiguration(
-            behavior: MyBehavior(),
-            child: child!,
+    return MultiProvider(
+      providers: providers!,
+      child: MaterialApp(
+        navigatorKey: locator<NavigationUtils>().navigatorKey,
+        title: 'Find Caption',
+        debugShowCheckedModeBanner: false,
+        builder: (context, child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0), //set desired text scale factor here
+            child: ScrollConfiguration(
+              behavior: MyBehavior(),
+              child: child!,
+            ),
+          );
+        },
+        theme: ThemeData(
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          primaryColor: primaryColor,
+          primarySwatch: primaryCustomSwatch,
+          fontFamily: fontName,
+          bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.black.withOpacity(0)),
+          scaffoldBackgroundColor: Colors.white,
+          pageTransitionsTheme: const PageTransitionsTheme(
+            builders: {
+              TargetPlatform.android: ZoomPageTransitionsBuilder(),
+              TargetPlatform.iOS: ZoomPageTransitionsBuilder(),
+            },
           ),
-        );
-      },
-      theme: ThemeData(
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        primaryColor: primaryColor,
-        primarySwatch: primaryCustomSwatch,
-        fontFamily: fontName,
-        bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.black.withOpacity(0)),
-        scaffoldBackgroundColor: Colors.white,
-        pageTransitionsTheme: const PageTransitionsTheme(
-          builders: {
-            TargetPlatform.android: ZoomPageTransitionsBuilder(),
-            TargetPlatform.iOS: ZoomPageTransitionsBuilder(),
-          },
+          colorScheme: const ColorScheme.light().copyWith(
+            primary: primaryColor,
+            onPrimary: primaryColor
+          ).copyWith(secondary: primaryColor),
         ),
-        colorScheme: const ColorScheme.light().copyWith(
-          primary: primaryColor,
-          onPrimary: primaryColor
-        ).copyWith(secondary: primaryColor),
+        initialRoute: routeHome,
+        onGenerateRoute: RouterGenerator.generate,
       ),
-      initialRoute: routeHome,
-      onGenerateRoute: RouterGenerator.generate,
     );
   }
 }
