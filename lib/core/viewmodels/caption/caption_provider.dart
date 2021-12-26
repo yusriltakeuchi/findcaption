@@ -65,4 +65,9 @@ class CaptionProvider extends ChangeNotifier {
     _onSearch = value;
     notifyListeners();
   }
+
+  void clearCaptions() {
+    _captions = null;
+    notifyListeners();
+  }
 }

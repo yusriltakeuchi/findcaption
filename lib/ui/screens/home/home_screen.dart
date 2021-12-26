@@ -1,8 +1,13 @@
+import 'package:badges/badges.dart';
+import 'package:findcaption/core/models/caption_model.dart';
 import 'package:findcaption/core/utils/dialog/dialog_utils.dart';
+import 'package:findcaption/core/utils/navigation/navigation_utils.dart';
 import 'package:findcaption/core/viewmodels/caption/caption_provider.dart';
 import 'package:findcaption/ui/constant/constant.dart';
 import 'package:findcaption/ui/widgets/components/buttons/primary_button.dart';
+import 'package:findcaption/ui/widgets/components/caption/caption_item.dart';
 import 'package:findcaption/ui/widgets/components/textfields/custom_textfield.dart';
+import 'package:findcaption/ui/widgets/idle/idle_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -23,12 +28,28 @@ class HomeScreen extends StatelessWidget {
               fontSize: setFontSize(45), color: Colors.white),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.language,
-              color: Colors.white,
-            ),
-            onPressed: () {},
+          Consumer<CaptionProvider>(
+            builder: (context, captionProv, _) {
+              return Padding(
+                padding: EdgeInsets.only(right: setWidth(50)),
+                child: Badge(
+                  position: BadgePosition.topEnd(top: 2, end: -8),
+                  showBadge: captionProv.captionLanguages != null &&
+                      captionProv.captionLanguages!.isNotEmpty,
+                  badgeColor: Colors.green,
+                  badgeContent: Text(
+                    captionProv.captionLanguages != null
+                        ? captionProv.captionLanguages!.length.toString()
+                        : "0",
+                    style: styleTitle.copyWith(color: Colors.white),
+                  ),
+                  child: const Icon(
+                    Icons.language,
+                    color: Colors.white,
+                  ),
+                ),
+              );
+            },
           )
         ],
       ),
@@ -51,21 +72,43 @@ class _HomeBodyState extends State<HomeBody> {
   void searchCaption(String from) async {
     whenTypeKeyword(keywordController.text);
     whenTypeYoutubeUrl(youtubeUrlController.text);
+
     if (validYoutubeUrl && validKeyword) {
       final captionProv = CaptionProvider.instance(context);
+      if (from == "empty") {
+        DialogShow.showLoading("Finding language...");
 
-      String? youtubeId = convertUrlToId(youtubeUrlController.text);
-      /// Find supported language
-      await captionProv.getCaptionLanguages(youtubeId!);
-      if (captionProv.captionLanguages!.isNotEmpty) {
-        captionProv.setSearchMode(true);
+        /// Get video id from URL
+        String? youtubeId = convertUrlToId(youtubeUrlController.text);
+
+        /// Find supported language
+        await captionProv.getCaptionLanguages(youtubeId!);
+        navigate.pop();
+
+        if (captionProv.captionLanguages!.isNotEmpty) {
+          captionProv.setSearchMode(true);
+          captionProv.getCaptions(
+            captionProv.captionLanguages!.first.code!,
+            youtubeId,
+            keywordController.text,
+          );
+        }
       } else {
-        DialogShow.showInfo(
-          "This video does not contain a caption", 
-          "Caption Not Found", 
-          "OK"
+        captionProv.clearCaptions();
+        /// Get video id from URL
+        String? youtubeId = convertUrlToId(youtubeUrlController.text);
+        captionProv.getCaptions(
+          captionProv.captionLanguages!.first.code!,
+          youtubeId!,
+          keywordController.text,
         );
       }
+    } else {
+      DialogShow.showInfo(
+        "This video does not contain a caption",
+        "Caption Not Found",
+        "OK",
+      );
     }
   }
 
@@ -146,26 +189,64 @@ class _HomeBodyState extends State<HomeBody> {
   Widget build(BuildContext context) {
     return Consumer<CaptionProvider>(
       builder: (context, captionProv, _) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: blackColor.withOpacity(0.1),
-                blurRadius: 5,
-                spreadRadius: 4,
-                offset: const Offset(0, 2),
+        return Column(
+          mainAxisAlignment: captionProv.searchCaptionMode == true
+              ? MainAxisAlignment.start
+              : MainAxisAlignment.center,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: captionProv.searchCaptionMode == true
+                    ? [
+                        BoxShadow(
+                          color: blackColor.withOpacity(0.1),
+                          blurRadius: 5,
+                          spreadRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
+                    : null,
               ),
-            ],
-          ),
-          child: AnimatedCrossFade(
-            firstChild: _contentEmptyWidget(),
-            secondChild: _contentFilledWidget(),
-            crossFadeState: captionProv.searchCaptionMode == false
-                ? CrossFadeState.showFirst
-                : CrossFadeState.showSecond,
-            duration: const Duration(milliseconds: 300),
-          ),
+              child: AnimatedCrossFade(
+                firstChild: _contentEmptyWidget(),
+                secondChild: _contentFilledWidget(),
+                crossFadeState: captionProv.searchCaptionMode == false
+                    ? CrossFadeState.showFirst
+                    : CrossFadeState.showSecond,
+                duration: const Duration(milliseconds: 300),
+              ),
+            ),
+            captionProv.searchCaptionMode == true
+                ? Expanded(
+                    child: SingleChildScrollView(
+                      child: _captionListWidget(captionProv.captions),
+                    ),
+                  )
+                : const SizedBox()
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _captionListWidget(List<CaptionModel>? captions) {
+    if (captions == null) {
+      return const IdleLoadingCenter();
+    }
+    if (captions.isEmpty) {
+      return const IdleNoItemCenter(
+        title: "Caption not found",
+      );
+    }
+
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: captions.length,
+      physics: const NeverScrollableScrollPhysics(),
+      itemBuilder: (context, index) {
+        return CaptionItem(
+          caption: captions[index],
         );
       },
     );
@@ -193,7 +274,7 @@ class _HomeBodyState extends State<HomeBody> {
           SizedBox(
             height: setHeight(40),
           ),
-          _fieldSubmit("filled")
+          _fieldSubmit("filled"),
         ],
       ),
     );
