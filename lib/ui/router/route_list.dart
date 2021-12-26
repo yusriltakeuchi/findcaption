@@ -3,3 +3,4 @@
 /// -------------------
 /// Home route
 const routeHome = "/home";
+const routeHomePickLanguage = "/home/pick-language";

@@ -20,6 +20,11 @@ class CaptionProvider extends ChangeNotifier {
   CaptionLanguageModel? _selectedCaptionLanguage;
   CaptionLanguageModel? get selectedCaptionLanguage => _selectedCaptionLanguage;
 
+  String? _currentYoutubeId;
+  String? get currentYoutubeId => _currentYoutubeId;
+  String? _currentKeyword;
+  String? get currentKeyword => _currentKeyword;
+
   bool? _searchCaptionMode = false;
   bool? get searchCaptionMode => _searchCaptionMode;
 
@@ -42,6 +47,8 @@ class CaptionProvider extends ChangeNotifier {
   void getCaptions(String languageCode, String youtubeId, String keyword) async {
     await Future.delayed(const Duration(milliseconds: 100));
     setOnSearch(true);
+    _currentYoutubeId = youtubeId;
+    _currentKeyword = keyword;
 
     var result = await captionService.getCaptions(languageCode, youtubeId, keyword);
     _captions = [];

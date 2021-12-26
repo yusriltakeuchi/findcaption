@@ -4,6 +4,7 @@ import 'package:findcaption/core/utils/dialog/dialog_utils.dart';
 import 'package:findcaption/core/utils/navigation/navigation_utils.dart';
 import 'package:findcaption/core/viewmodels/caption/caption_provider.dart';
 import 'package:findcaption/ui/constant/constant.dart';
+import 'package:findcaption/ui/router/route_list.dart';
 import 'package:findcaption/ui/widgets/components/buttons/primary_button.dart';
 import 'package:findcaption/ui/widgets/components/caption/caption_item.dart';
 import 'package:findcaption/ui/widgets/components/textfields/custom_textfield.dart';
@@ -13,8 +14,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  void pickLanguage() async {
+    final captionProv = CaptionProvider.instance(context);
+    if (captionProv.captionLanguages != null && captionProv.captionLanguages!.isNotEmpty) {
+      var result = await navigate.pushTo(routeHomePickLanguage, data: captionProv.captionLanguages);
+      if (result != null) {
+        captionProv.setSelectedCaptionLanguage(result);
+        captionProv.clearCaptions();
+
+        captionProv.getCaptions(
+          captionProv.selectedCaptionLanguage!.code!,
+          captionProv.currentYoutubeId!,
+          captionProv.currentKeyword!,
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,27 +49,32 @@ class HomeScreen extends StatelessWidget {
         title: Text(
           "Find Caption",
           style: styleTitle.copyWith(
-              fontSize: setFontSize(45), color: Colors.white),
+            fontSize: setFontSize(45),
+            color: Colors.white,
+          ),
         ),
         actions: [
           Consumer<CaptionProvider>(
             builder: (context, captionProv, _) {
               return Padding(
                 padding: EdgeInsets.only(right: setWidth(50)),
-                child: Badge(
-                  position: BadgePosition.topEnd(top: 2, end: -8),
-                  showBadge: captionProv.captionLanguages != null &&
-                      captionProv.captionLanguages!.isNotEmpty,
-                  badgeColor: Colors.green,
-                  badgeContent: Text(
-                    captionProv.captionLanguages != null
-                        ? captionProv.captionLanguages!.length.toString()
-                        : "0",
-                    style: styleTitle.copyWith(color: Colors.white),
-                  ),
-                  child: const Icon(
-                    Icons.language,
-                    color: Colors.white,
+                child: GestureDetector(
+                  onTap: () => pickLanguage(),
+                  child: Badge(
+                    position: BadgePosition.topEnd(top: 2, end: -8),
+                    showBadge: captionProv.captionLanguages != null &&
+                        captionProv.captionLanguages!.isNotEmpty,
+                    badgeColor: Colors.green,
+                    badgeContent: Text(
+                      captionProv.captionLanguages != null
+                          ? captionProv.captionLanguages!.length.toString()
+                          : "0",
+                      style: styleTitle.copyWith(color: Colors.white),
+                    ),
+                    child: const Icon(
+                      Icons.language,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               );
@@ -88,7 +116,8 @@ class _HomeBodyState extends State<HomeBody> {
 
         if (captionProv.captionLanguages!.isNotEmpty) {
           captionProv.setSearchMode(true);
-          captionProv.setSelectedCaptionLanguage(captionProv.captionLanguages!.first);
+          captionProv
+              .setSelectedCaptionLanguage(captionProv.captionLanguages!.first);
           captionProv.getCaptions(
             captionProv.selectedCaptionLanguage!.code!,
             youtubeId,
@@ -97,6 +126,7 @@ class _HomeBodyState extends State<HomeBody> {
         }
       } else {
         captionProv.clearCaptions();
+
         /// Get video id from URL
         String? youtubeId = convertUrlToId(youtubeUrlController.text);
         captionProv.getCaptions(

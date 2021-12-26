@@ -1,5 +1,7 @@
 
+import 'package:findcaption/core/models/caption_language_model.dart';
 import 'package:findcaption/ui/router/route_list.dart';
+import 'package:findcaption/ui/screens/home/home_pick_language_screen.dart';
 import 'package:findcaption/ui/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -7,10 +9,17 @@ class RouterGenerator {
 
   /// Initializing route
   static Route<dynamic>? generate(RouteSettings settings) {
+    final args = settings.arguments;
     switch (settings.name) {
       /// Home group
       case routeHome:
         return MaterialPageRoute(builder: (_) => const HomeScreen(), settings: const RouteSettings(name: routeHome));
+      case routeHomePickLanguage:
+        if (args is List<CaptionLanguageModel>?) {
+          return MaterialPageRoute(builder: (_) => HomePickLanguageScreen(
+            languages: args,
+          ), settings: const RouteSettings(name: routeHomePickLanguage));
+        }
     }
   }
 }
