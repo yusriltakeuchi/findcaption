@@ -24,8 +24,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   void pickLanguage() async {
     final captionProv = CaptionProvider.instance(context);
-    if (captionProv.captionLanguages != null && captionProv.captionLanguages!.isNotEmpty) {
-      var result = await navigate.pushTo(routeHomePickLanguage, data: captionProv.captionLanguages);
+    if (captionProv.captionLanguages != null &&
+        captionProv.captionLanguages!.isNotEmpty) {
+      var result = await navigate.pushTo(routeHomePickLanguage,
+          data: captionProv.captionLanguages);
       if (result != null) {
         captionProv.setSelectedCaptionLanguage(result);
         captionProv.clearCaptions();
@@ -272,15 +274,64 @@ class _HomeBodyState extends State<HomeBody> {
       );
     }
 
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: captions.length,
-      physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (context, index) {
-        return CaptionItem(
-          caption: captions[index],
-        );
-      },
+    final matchedCaptions = captions.where((item) => item.text!.toLowerCase().contains(keywordController.text)).toList();
+    final similarCaptions = captions.where((item) => !item.text!.toLowerCase().contains(keywordController.text)).toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: setHeight(40),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: setWidth(30),
+          ),
+          child: Text(
+            "Matching Sentence:",
+            style: styleTitle.copyWith(
+              fontSize: setFontSize(45),
+            ),
+          ),
+        ),
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: matchedCaptions.length,
+          padding: EdgeInsets.zero,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            return CaptionItem(
+              caption: matchedCaptions[index],
+              keyword: keywordController.text,
+            );
+          },
+        ),
+
+        SizedBox(
+          height: setHeight(20),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: setWidth(40),
+          ),
+          child: Text(
+            "Similar:",
+            style: styleTitle.copyWith(
+              fontSize: setFontSize(45),
+            ),
+          ),
+        ),
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: similarCaptions.length,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            return CaptionItem(
+              caption: similarCaptions[index],
+              keyword: keywordController.text,
+            );
+          },
+        ),
+      ],
     );
   }
 

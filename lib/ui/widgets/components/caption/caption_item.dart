@@ -1,14 +1,17 @@
 import 'package:findcaption/ui/constant/constant.dart';
 import 'package:findcaption/ui/widgets/components/buttons/primary_button.dart';
+import 'package:findcaption/ui/widgets/components/caption/highlight_text.dart';
 import 'package:flutter/material.dart';
 
 import 'package:findcaption/core/models/caption_model.dart';
 
 class CaptionItem extends StatelessWidget {
   final CaptionModel? caption;
+  final String? keyword;
   const CaptionItem({
     Key? key,
     required this.caption,
+    required this.keyword
   }) : super(key: key);
 
   @override
@@ -42,15 +45,21 @@ class CaptionItem extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              caption!.text!,
+                            HighlightText(
+                              text: caption!.text!,
+                              highlight: keyword,
+                              ignoreCase: true,
                               style: styleTitle.copyWith(
                                 color: blackColor,
                                 fontSize: setFontSize(40),
                               ),
+                              highlightStyle: styleTitle.copyWith(
+                                fontSize: setFontSize(40),
+                                backgroundColor: Colors.yellow
+                              ),
                             ),
                             Text(
-                              "From minute ${caption?.startPosition}",
+                              "From ${caption?.startPosition} minute",
                               style: styleSubtitle.copyWith(
                                 color: blackColor,
                                 fontSize: setFontSize(35),
