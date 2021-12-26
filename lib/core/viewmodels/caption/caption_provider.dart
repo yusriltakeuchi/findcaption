@@ -17,6 +17,8 @@ class CaptionProvider extends ChangeNotifier {
   /// List of caption languages
   List<CaptionLanguageModel>? _captionLanguages;
   List<CaptionLanguageModel>? get captionLanguages => _captionLanguages;
+  CaptionLanguageModel? _selectedCaptionLanguage;
+  CaptionLanguageModel? get selectedCaptionLanguage => _selectedCaptionLanguage;
 
   bool? _searchCaptionMode = false;
   bool? get searchCaptionMode => _searchCaptionMode;
@@ -52,6 +54,11 @@ class CaptionProvider extends ChangeNotifier {
     var result = await captionService.getCaptionLanguages(youtubeId);
     _captionLanguages = [];
     _captionLanguages = result;
+    notifyListeners();
+  }
+
+  void setSelectedCaptionLanguage(CaptionLanguageModel value) {
+    _selectedCaptionLanguage = value;
     notifyListeners();
   }
 

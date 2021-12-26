@@ -8,6 +8,7 @@ import 'package:findcaption/ui/widgets/components/buttons/primary_button.dart';
 import 'package:findcaption/ui/widgets/components/caption/caption_item.dart';
 import 'package:findcaption/ui/widgets/components/textfields/custom_textfield.dart';
 import 'package:findcaption/ui/widgets/idle/idle_item.dart';
+import 'package:findcaption/ui/widgets/idle/loading_listview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -87,8 +88,9 @@ class _HomeBodyState extends State<HomeBody> {
 
         if (captionProv.captionLanguages!.isNotEmpty) {
           captionProv.setSearchMode(true);
+          captionProv.setSelectedCaptionLanguage(captionProv.captionLanguages!.first);
           captionProv.getCaptions(
-            captionProv.captionLanguages!.first.code!,
+            captionProv.selectedCaptionLanguage!.code!,
             youtubeId,
             keywordController.text,
           );
@@ -232,7 +234,7 @@ class _HomeBodyState extends State<HomeBody> {
 
   Widget _captionListWidget(List<CaptionModel>? captions) {
     if (captions == null) {
-      return const IdleLoadingCenter();
+      return const LoadingListView();
     }
     if (captions.isEmpty) {
       return const IdleNoItemCenter(
