@@ -119,8 +119,9 @@ class _HomeBodyState extends State<HomeBody> {
 
         if (captionProv.captionLanguages!.isNotEmpty) {
           captionProv.setSearchMode(true);
-          captionProv
-              .setSelectedCaptionLanguage(captionProv.captionLanguages!.first);
+          captionProv.setSelectedCaptionLanguage(
+            captionProv.captionLanguages!.first,
+          );
           captionProv.getCaptions(
             captionProv.selectedCaptionLanguage!.code!,
             youtubeId,
@@ -255,7 +256,9 @@ class _HomeBodyState extends State<HomeBody> {
             captionProv.searchCaptionMode == true
                 ? Expanded(
                     child: SingleChildScrollView(
-                      child: _captionListWidget(captionProv.captions),
+                      child: _captionListWidget(
+                        captionProv.captions,
+                      ),
                     ),
                   )
                 : const SizedBox()
@@ -275,8 +278,14 @@ class _HomeBodyState extends State<HomeBody> {
       );
     }
 
-    final matchedCaptions = captions.where((item) => item.text!.toLowerCase().contains(keywordController.text)).toList();
-    final similarCaptions = captions.where((item) => !item.text!.toLowerCase().contains(keywordController.text)).toList();
+    final matchedCaptions = captions
+        .where(
+            (item) => item.text!.toLowerCase().contains(keywordController.text))
+        .toList();
+    final similarCaptions = captions
+        .where((item) =>
+            !item.text!.toLowerCase().contains(keywordController.text))
+        .toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -300,13 +309,20 @@ class _HomeBodyState extends State<HomeBody> {
           padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
+            final caption = matchedCaptions[index];
             return CaptionItem(
-              caption: matchedCaptions[index],
+              caption: caption,
               keyword: keywordController.text,
+              onClickPlay: () => navigate.pushTo(
+                routeVideoPlayer,
+                data: [
+                  convertUrlToId(youtubeUrlController.text),
+                  caption.startPosition
+                ],
+              ),
             );
           },
         ),
-
         SizedBox(
           height: setHeight(20),
         ),
@@ -326,9 +342,17 @@ class _HomeBodyState extends State<HomeBody> {
           itemCount: similarCaptions.length,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
+            final caption = matchedCaptions[index];
             return CaptionItem(
               caption: similarCaptions[index],
               keyword: keywordController.text,
+              onClickPlay: () => navigate.pushTo(
+                routeVideoPlayer,
+                data: [
+                  convertUrlToId(youtubeUrlController.text),
+                  caption.startPosition
+                ],
+              ),
             );
           },
         ),

@@ -8,10 +8,12 @@ import 'package:findcaption/core/models/caption_model.dart';
 class CaptionItem extends StatelessWidget {
   final CaptionModel? caption;
   final String? keyword;
+  final VoidCallback? onClickPlay;
   const CaptionItem({
     Key? key,
     required this.caption,
-    required this.keyword
+    required this.keyword,
+    required this.onClickPlay
   }) : super(key: key);
 
   @override
@@ -82,7 +84,7 @@ class CaptionItem extends StatelessWidget {
                     title: "PLAY",
                     horizontalPadding: 5,
                     fontSize: 34,
-                    onClick: () {},
+                    onClick: () => onClickPlay!(),
                   ),
                 )
               ],
