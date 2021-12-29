@@ -20,6 +20,7 @@ class CaptionProvider extends ChangeNotifier {
   CaptionLanguageModel? _selectedCaptionLanguage;
   CaptionLanguageModel? get selectedCaptionLanguage => _selectedCaptionLanguage;
 
+  /// Save current state youtube url and keyword
   String? _currentYoutubeId;
   String? get currentYoutubeId => _currentYoutubeId;
   String? _currentKeyword;

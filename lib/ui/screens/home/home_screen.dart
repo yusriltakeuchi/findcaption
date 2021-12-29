@@ -26,8 +26,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final captionProv = CaptionProvider.instance(context);
     if (captionProv.captionLanguages != null &&
         captionProv.captionLanguages!.isNotEmpty) {
-      var result = await navigate.pushTo(routeHomePickLanguage,
-          data: captionProv.captionLanguages);
+      var result = await navigate.pushTo(
+        routeHomePickLanguage,
+        data: captionProv.captionLanguages,
+      );
       if (result != null) {
         captionProv.setSelectedCaptionLanguage(result);
         captionProv.clearCaptions();
@@ -108,17 +110,15 @@ class _HomeBodyState extends State<HomeBody> {
     if (validYoutubeUrl && validKeyword) {
       final captionProv = CaptionProvider.instance(context);
       if (from == "empty") {
-        DialogShow.showLoading("Finding language...");
 
+        captionProv.setSearchMode(true);
         /// Get video id from URL
         String? youtubeId = convertUrlToId(youtubeUrlController.text);
 
         /// Find supported language
         await captionProv.getCaptionLanguages(youtubeId!);
-        navigate.pop();
 
         if (captionProv.captionLanguages!.isNotEmpty) {
-          captionProv.setSearchMode(true);
           captionProv.setSelectedCaptionLanguage(
             captionProv.captionLanguages!.first,
           );
@@ -342,7 +342,7 @@ class _HomeBodyState extends State<HomeBody> {
           itemCount: similarCaptions.length,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
-            final caption = matchedCaptions[index];
+            final caption = similarCaptions[index];
             return CaptionItem(
               caption: similarCaptions[index],
               keyword: keywordController.text,
