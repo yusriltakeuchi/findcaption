@@ -169,7 +169,7 @@ class _HomeBodyState extends State<HomeBody> {
   bool validYoutubeUrl = true;
   void whenTypeYoutubeUrl(String value) {
     String patternUrl =
-        r"^((http|https)\:\/\/)?(www\.youtube\.com|youtu\.?be)\/((watch\?v=)?(.{11}))(&.*)*$";
+        r"^((http|https)\:\/\/)?((www|m)\.youtube\.com|youtu\.?be)\/((watch\?v=)?(.{11}))(&.*)*$";
     if (value.isEmpty) {
       if (validYoutubeUrl == true) {
         setState(() {
