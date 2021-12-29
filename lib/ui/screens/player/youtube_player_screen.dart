@@ -30,12 +30,19 @@ class _YoutubePlayerScreenState extends State<YoutubePlayerScreen> {
         startAt: widget.position!
       ),
     );
+    _controller.toggleFullScreenMode();
   }
 
   @override
   void initState() {
     super.initState();
     loadYoutubeController();
+  }
+
+  @override
+  void dispose() {
+    _controller.toggleFullScreenMode();
+    super.dispose();
   }
   @override
   Widget build(BuildContext context) {

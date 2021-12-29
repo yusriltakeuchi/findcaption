@@ -61,7 +61,7 @@ class CaptionItem extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              "From ${caption?.startPosition} minute",
+                              "Position ${caption?.startPosition}",
                               style: styleSubtitle.copyWith(
                                 color: blackColor,
                                 fontSize: setFontSize(35),
