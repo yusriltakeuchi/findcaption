@@ -13,6 +13,7 @@ import 'package:findcaption/ui/widgets/idle/loading_listview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -103,6 +104,14 @@ class _HomeBodyState extends State<HomeBody> {
   var youtubeUrlController = TextEditingController();
   var keywordController = TextEditingController();
 
+  void goToPlay(int? startPosition) async {
+    await navigate.pushTo(
+      routeVideoPlayer,
+      data: [YoutubePlayer.convertUrlToId(youtubeUrlController.text), startPosition],
+    );
+    setupScreenUtil(context);
+  }
+
   void searchCaption(String from) async {
     whenTypeKeyword(keywordController.text);
     whenTypeYoutubeUrl(youtubeUrlController.text);
@@ -110,10 +119,10 @@ class _HomeBodyState extends State<HomeBody> {
     if (validYoutubeUrl && validKeyword) {
       final captionProv = CaptionProvider.instance(context);
       if (from == "empty") {
-
         captionProv.setSearchMode(true);
+
         /// Get video id from URL
-        String? youtubeId = convertUrlToId(youtubeUrlController.text);
+        String? youtubeId = YoutubePlayer.convertUrlToId(youtubeUrlController.text);
 
         /// Find supported language
         await captionProv.getCaptionLanguages(youtubeId!);
@@ -132,7 +141,7 @@ class _HomeBodyState extends State<HomeBody> {
         captionProv.clearCaptions();
 
         /// Get video id from URL
-        String? youtubeId = convertUrlToId(youtubeUrlController.text);
+        String? youtubeId = YoutubePlayer.convertUrlToId(youtubeUrlController.text);
         captionProv.getCaptions(
           captionProv.captionLanguages!.first.code!,
           youtubeId!,
@@ -146,24 +155,6 @@ class _HomeBodyState extends State<HomeBody> {
         "OK",
       );
     }
-  }
-
-  String? convertUrlToId(String url, {bool trimWhitespaces = true}) {
-    if (!url.contains("http") && (url.length == 11)) return url;
-    if (trimWhitespaces) url = url.trim();
-
-    for (var exp in [
-      RegExp(
-          r"^https:\/\/(?:www\.|m\.)?youtube\.com\/watch\?v=([_\-a-zA-Z0-9]{11}).*$"),
-      RegExp(
-          r"^https:\/\/(?:www\.|m\.)?youtube(?:-nocookie)?\.com\/embed\/([_\-a-zA-Z0-9]{11}).*$"),
-      RegExp(r"^https:\/\/youtu\.be\/([_\-a-zA-Z0-9]{11}).*$")
-    ]) {
-      Match? match = exp.firstMatch(url);
-      if (match != null && match.groupCount >= 1) return match.group(1);
-    }
-
-    return null;
   }
 
   bool validYoutubeUrl = true;
@@ -313,13 +304,7 @@ class _HomeBodyState extends State<HomeBody> {
             return CaptionItem(
               caption: caption,
               keyword: keywordController.text,
-              onClickPlay: () => navigate.pushTo(
-                routeVideoPlayer,
-                data: [
-                  convertUrlToId(youtubeUrlController.text),
-                  caption.startPosition
-                ],
-              ),
+              onClickPlay: () => goToPlay(caption.startPosition),
             );
           },
         ),
@@ -346,13 +331,7 @@ class _HomeBodyState extends State<HomeBody> {
             return CaptionItem(
               caption: similarCaptions[index],
               keyword: keywordController.text,
-              onClickPlay: () => navigate.pushTo(
-                routeVideoPlayer,
-                data: [
-                  convertUrlToId(youtubeUrlController.text),
-                  caption.startPosition
-                ],
-              ),
+              onClickPlay: () => goToPlay(caption.startPosition),
             );
           },
         ),
