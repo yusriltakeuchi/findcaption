@@ -1,16 +1,36 @@
-# findcaption
 
-A new Flutter project.
+# FindCaption
 
-## Getting Started
+[![Fork](https://img.shields.io/github/forks/yusriltakeuchi/cakedetector?style=social)](https://github.com/yusriltakeuchi/findcaption/fork)&nbsp; [![Star](https://img.shields.io/github/stars/yusriltakeuchi/cakedetector?style=social)](https://github.com/yusriltakeuchi/findcaption/star)&nbsp; [![Watches](https://img.shields.io/github/watchers/yusriltakeuchi/cakedetector?style=social)](https://github.com/yusriltakeuchi/findcaption/)&nbsp;
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+<p><img  src="https://i.ibb.co/hB4t6Tj/Portfolio.png"/></p>
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+**Find Caption** adalah aplikasi yang berfungsi untuk mencari posisi track youtube berdasarkan sebuah kata kunci dan memutar video pada posisi track yang paling sesuai / dipilih.
+Aplikasi ini mendukung jenis bahasa apapun tergantung dari ketersediaan subtitle pada video tersebut.
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Misalnya videonya hanya support subtitle indonesia dan inggris, maka hanya bisa cari kata kunci berdasarkan 2 bahasa itu.
+
+Hasil pencariannya akan dibagi 2 jenis:
+1. Matching Sentence = Track subtitle yang sangat mirip dengan pencarian
+2. Similar  = Track subtitle yang agak mirip dengan pencarian 
+
+Dibangun dengan:
+- Flutter sebagai Mobile Framework
+- Python Flask sebagai API
+- Heroku sebagai tempat untuk deploy API
+
+Menggunakan Pattern MVVM dan state management Provider.
+
+### Apps Feature:
+
+ - Find Caption Subtitle
+ - Support Multiple Language
+ - Match and Similar Sentence
+ 
+
+  ### Setup
+ 1. git clone https://github.com/yusriltakeuchi/findcaption.git
+ 2. flutter packages get
+ 3. flutter run
+ 4. Happy coding!
