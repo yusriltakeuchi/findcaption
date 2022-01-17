@@ -1,7 +1,7 @@
 
 # FindCaption
 
-[![Fork](https://img.shields.io/github/forks/yusriltakeuchi/cakedetector?style=social)](https://github.com/yusriltakeuchi/findcaption/fork)&nbsp; [![Star](https://img.shields.io/github/stars/yusriltakeuchi/cakedetector?style=social)](https://github.com/yusriltakeuchi/findcaption/star)&nbsp; [![Watches](https://img.shields.io/github/watchers/yusriltakeuchi/cakedetector?style=social)](https://github.com/yusriltakeuchi/findcaption/)&nbsp;
+[![Fork](https://img.shields.io/github/forks/yusriltakeuchi/findcaption?style=social)](https://github.com/yusriltakeuchi/findcaption/fork)&nbsp; [![Star](https://img.shields.io/github/stars/yusriltakeuchi/findcaption?style=social)](https://github.com/yusriltakeuchi/findcaption/star)&nbsp; [![Watches](https://img.shields.io/github/watchers/yusriltakeuchi/findcaption?style=social)](https://github.com/yusriltakeuchi/findcaption/)&nbsp;
 
 
 <p><img  src="https://i.ibb.co/hB4t6Tj/Portfolio.png"/></p>
