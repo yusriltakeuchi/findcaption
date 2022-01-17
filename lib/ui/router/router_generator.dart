@@ -1,5 +1,4 @@
 
-import 'package:findcaption/core/models/caption_language_model.dart';
 import 'package:findcaption/ui/router/route_list.dart';
 import 'package:findcaption/ui/screens/home/home_pick_language_screen.dart';
 import 'package:findcaption/ui/screens/home/home_screen.dart';
@@ -16,9 +15,10 @@ class RouterGenerator {
       case routeHome:
         return MaterialPageRoute(builder: (_) => const HomeScreen(), settings: const RouteSettings(name: routeHome));
       case routeHomePickLanguage:
-        if (args is List<CaptionLanguageModel>?) {
+        if (args is List) {
           return MaterialPageRoute(builder: (_) => HomePickLanguageScreen(
-            languages: args,
+            languages: args[0],
+            selectedLanguage: args[1],
           ), settings: const RouteSettings(name: routeHomePickLanguage));
         }
         break;

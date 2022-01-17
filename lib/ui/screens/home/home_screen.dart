@@ -29,7 +29,10 @@ class _HomeScreenState extends State<HomeScreen> {
         captionProv.captionLanguages!.isNotEmpty) {
       var result = await navigate.pushTo(
         routeHomePickLanguage,
-        data: captionProv.captionLanguages,
+        data: [
+          captionProv.captionLanguages,
+          captionProv.selectedCaptionLanguage
+        ],
       );
       if (result != null) {
         captionProv.setSelectedCaptionLanguage(result);
@@ -149,12 +152,13 @@ class _HomeBodyState extends State<HomeBody> {
         /// Get video id from URL
         String? youtubeId =
             YoutubePlayer.convertUrlToId(youtubeUrlController.text);
-
-        /// Find supported language
-        await captionProv.getCaptionLanguages(youtubeId!);
+        if (youtubeId != captionProv.currentYoutubeId) {
+          /// Find supported language
+          await captionProv.getCaptionLanguages(youtubeId!);
+        }
         captionProv.getCaptions(
-          captionProv.captionLanguages!.first.code!,
-          youtubeId,
+          captionProv.selectedCaptionLanguage!.code!,
+          youtubeId!,
           keywordController.text,
         );
       }

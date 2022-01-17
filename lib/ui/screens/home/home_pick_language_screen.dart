@@ -6,9 +6,11 @@ import 'package:findcaption/core/models/caption_language_model.dart';
 
 class HomePickLanguageScreen extends StatelessWidget {
   final List<CaptionLanguageModel>? languages;
+  final CaptionLanguageModel? selectedLanguage;
   const HomePickLanguageScreen({
     Key? key,
     required this.languages,
+    required this.selectedLanguage,
   }) : super(key: key);
 
   @override
@@ -36,20 +38,26 @@ class HomePickLanguageScreen extends StatelessWidget {
         itemCount: languages!.length,
         physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
-
           final lang = languages?[index];
           return _languageItem(
             lang,
             onClick: () {
               navigate.pop(data: lang);
-            }
+            },
+            selected: selectedLanguage != null
+                ? lang?.code == selectedLanguage?.code
+                : false,
           );
         },
       ),
     );
   }
 
-  Widget _languageItem(CaptionLanguageModel? lang, {VoidCallback? onClick}) {
+  Widget _languageItem(
+    CaptionLanguageModel? lang, {
+    VoidCallback? onClick,
+    bool selected = false,
+  }) {
     return InkWell(
       onTap: () => onClick!(),
       child: Padding(
@@ -103,8 +111,10 @@ class HomePickLanguageScreen extends StatelessWidget {
                   width: setWidth(20),
                 ),
                 Icon(
-                  Icons.keyboard_arrow_right,
-                  color: blackColor,
+                  selected == true
+                      ? Icons.check_circle
+                      : Icons.keyboard_arrow_right,
+                  color: selected == true ? greenColor : blackColor,
                 )
               ],
             ),
