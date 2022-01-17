@@ -6,10 +6,12 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 class YoutubePlayerScreen extends StatefulWidget {
   final String? youtubeId;
   final int? position;
+  final String? language;
   const YoutubePlayerScreen({
     Key? key,
-    this.youtubeId,
-    this.position,
+    required this.youtubeId,
+    required this.position,
+    required this.language
   }) : super(key: key);
  
   @override
@@ -26,7 +28,7 @@ class _YoutubePlayerScreenState extends State<YoutubePlayerScreen> {
         autoPlay: true,
         mute: false,
         forceHD: true,
-        useHybridComposition: false,
+        captionLanguage: widget.language!,
         startAt: widget.position!
       ),
     );
@@ -49,37 +51,43 @@ class _YoutubePlayerScreenState extends State<YoutubePlayerScreen> {
     return Scaffold(
       body: WillPopScope(
         onWillPop: () async => false,
-        child: YoutubePlayerBuilder(
-          player: YoutubePlayer(
-            controller: _controller,
-            showVideoProgressIndicator: true,
-            progressIndicatorColor: Colors.pink,
-            progressColors: ProgressBarColors(
-              playedColor: primaryColor, 
-              handleColor: Colors.blueAccent
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Center(
+            child: YoutubePlayerBuilder(
+              player: YoutubePlayer(
+                controller: _controller,
+                showVideoProgressIndicator: true,
+                progressIndicatorColor: Colors.pink,
+                progressColors: ProgressBarColors(
+                  playedColor: primaryColor, 
+                  handleColor: Colors.blueAccent
+                ),
+                topActions: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.white), 
+                    onPressed: () {
+                      navigate.pop(data: _controller.value.position);
+                    }
+                  )
+                ],
+                bottomActions: [
+                  CurrentPosition(),
+                  ProgressBar(isExpanded: true),
+                  RemainingDuration(),
+                  const PlaybackSpeedButton()
+                ],
+              ), 
+              builder: (context, player) {
+                return Column(
+                  children: [
+                    player,
+                  ],
+                );
+              }
             ),
-            topActions: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white), 
-                onPressed: () {
-                  navigate.pop(data: _controller.value.position);
-                }
-              )
-            ],
-            bottomActions: [
-              CurrentPosition(),
-              ProgressBar(isExpanded: true),
-              RemainingDuration(),
-              const PlaybackSpeedButton()
-            ],
-          ), 
-          builder: (context, player) {
-            return Column(
-              children: [
-                player,
-              ],
-            );
-          }
+          ),
         ),
       ),
     );

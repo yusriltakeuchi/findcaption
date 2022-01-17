@@ -105,9 +105,14 @@ class _HomeBodyState extends State<HomeBody> {
   var keywordController = TextEditingController();
 
   void goToPlay(int? startPosition) async {
+    final captionProv = CaptionProvider.instance(context);
     await navigate.pushTo(
       routeVideoPlayer,
-      data: [YoutubePlayer.convertUrlToId(youtubeUrlController.text), startPosition],
+      data: [
+        YoutubePlayer.convertUrlToId(youtubeUrlController.text),
+        startPosition,
+        captionProv.selectedCaptionLanguage?.code,
+      ],
     );
     setupScreenUtil(context);
   }
@@ -122,7 +127,8 @@ class _HomeBodyState extends State<HomeBody> {
         captionProv.setSearchMode(true);
 
         /// Get video id from URL
-        String? youtubeId = YoutubePlayer.convertUrlToId(youtubeUrlController.text);
+        String? youtubeId =
+            YoutubePlayer.convertUrlToId(youtubeUrlController.text);
 
         /// Find supported language
         await captionProv.getCaptionLanguages(youtubeId!);
@@ -139,12 +145,14 @@ class _HomeBodyState extends State<HomeBody> {
         }
       } else {
         captionProv.clearCaptions();
-
         /// Get video id from URL
         String? youtubeId = YoutubePlayer.convertUrlToId(youtubeUrlController.text);
+
+        /// Find supported language
+        await captionProv.getCaptionLanguages(youtubeId!);
         captionProv.getCaptions(
           captionProv.captionLanguages!.first.code!,
-          youtubeId!,
+          youtubeId,
           keywordController.text,
         );
       }
