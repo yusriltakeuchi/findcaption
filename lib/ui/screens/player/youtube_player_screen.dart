@@ -23,13 +23,13 @@ class _YoutubePlayerScreenState extends State<YoutubePlayerScreen> {
 
   void loadYoutubeController() async {
     _controller = YoutubePlayerController(
-      initialVideoId: widget.youtubeId!,
+      initialVideoId: widget.youtubeId ?? "",
       flags: YoutubePlayerFlags(
         autoPlay: true,
         mute: false,
         forceHD: true,
-        captionLanguage: widget.language!,
-        startAt: widget.position!
+        captionLanguage: widget.language ?? "",
+        startAt: widget.position ?? 0
       ),
     );
     _controller.toggleFullScreenMode();
@@ -68,6 +68,7 @@ class _YoutubePlayerScreenState extends State<YoutubePlayerScreen> {
                   IconButton(
                     icon: const Icon(Icons.arrow_back, color: Colors.white), 
                     onPressed: () {
+                      _controller.pause();
                       navigate.pop(data: _controller.value.position);
                     }
                   )

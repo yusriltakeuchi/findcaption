@@ -145,8 +145,10 @@ class _HomeBodyState extends State<HomeBody> {
         }
       } else {
         captionProv.clearCaptions();
+
         /// Get video id from URL
-        String? youtubeId = YoutubePlayer.convertUrlToId(youtubeUrlController.text);
+        String? youtubeId =
+            YoutubePlayer.convertUrlToId(youtubeUrlController.text);
 
         /// Find supported language
         await captionProv.getCaptionLanguages(youtubeId!);
@@ -224,46 +226,63 @@ class _HomeBodyState extends State<HomeBody> {
   Widget build(BuildContext context) {
     return Consumer<CaptionProvider>(
       builder: (context, captionProv, _) {
-        return Column(
-          mainAxisAlignment: captionProv.searchCaptionMode == true
-              ? MainAxisAlignment.start
-              : MainAxisAlignment.center,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: captionProv.searchCaptionMode == true
-                    ? [
-                        BoxShadow(
-                          color: blackColor.withOpacity(0.1),
-                          blurRadius: 5,
-                          spreadRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ]
-                    : null,
-              ),
-              child: AnimatedCrossFade(
-                firstChild: _contentEmptyWidget(),
-                secondChild: _contentFilledWidget(),
-                crossFadeState: captionProv.searchCaptionMode == false
-                    ? CrossFadeState.showFirst
-                    : CrossFadeState.showSecond,
-                duration: const Duration(milliseconds: 300),
+        if (captionProv.searchCaptionMode == false) {
+          return Center(
+            child: SingleChildScrollView(
+              child: _contentWidget(
+                captionProv.searchCaptionMode,
+                captionProv.captions,
               ),
             ),
-            captionProv.searchCaptionMode == true
-                ? Expanded(
-                    child: SingleChildScrollView(
-                      child: _captionListWidget(
-                        captionProv.captions,
-                      ),
-                    ),
-                  )
-                : const SizedBox()
-          ],
+          );
+        }
+        return _contentWidget(
+          captionProv.searchCaptionMode,
+          captionProv.captions,
         );
       },
+    );
+  }
+
+  Widget _contentWidget(bool? searchCaptionMode, List<CaptionModel>? captions) {
+    return Column(
+      mainAxisAlignment: searchCaptionMode == true
+          ? MainAxisAlignment.start
+          : MainAxisAlignment.center,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: searchCaptionMode == true
+                ? [
+                    BoxShadow(
+                      color: blackColor.withOpacity(0.1),
+                      blurRadius: 5,
+                      spreadRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: AnimatedCrossFade(
+            firstChild: _contentEmptyWidget(),
+            secondChild: _contentFilledWidget(),
+            crossFadeState: searchCaptionMode == false
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            duration: const Duration(milliseconds: 300),
+          ),
+        ),
+        searchCaptionMode == true
+            ? Expanded(
+                child: SingleChildScrollView(
+                  child: _captionListWidget(
+                    captions,
+                  ),
+                ),
+              )
+            : const SizedBox()
+      ],
     );
   }
 
@@ -279,11 +298,13 @@ class _HomeBodyState extends State<HomeBody> {
 
     final matchedCaptions = captions
         .where(
-            (item) => item.text!.toLowerCase().contains(keywordController.text))
+          (item) => item.text!.toLowerCase().contains(keywordController.text),
+        )
         .toList();
     final similarCaptions = captions
-        .where((item) =>
-            !item.text!.toLowerCase().contains(keywordController.text))
+        .where(
+          (item) => !item.text!.toLowerCase().contains(keywordController.text),
+        )
         .toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
