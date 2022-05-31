@@ -80,10 +80,8 @@ void setupScreenUtil(BuildContext context) {
   }
 
   ScreenUtil.init(
-    BoxConstraints(
-      maxWidth: baseWidth,
-      maxHeight: baseHeight
-    ),
+    context,
+    deviceSize: Size(baseWidth, baseHeight),
     designSize: Size(designWidth, designHeight),
     orientation: Orientation.portrait
   );

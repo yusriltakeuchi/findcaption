@@ -46,9 +46,10 @@ class MyApp extends StatelessWidget {
         navigatorKey: locator<NavigationUtils>().navigatorKey,
         title: 'Find Caption',
         debugShowCheckedModeBanner: false,
-        builder: (context, child) {
+        builder: (ctx, child) {
+          setupScreenUtil(ctx);
           return MediaQuery(
-            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0), //set desired text scale factor here
+            data: MediaQuery.of(ctx).copyWith(textScaleFactor: 1.0),
             child: ScrollConfiguration(
               behavior: MyBehavior(),
               child: child!,
