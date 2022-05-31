@@ -115,6 +115,7 @@ class _HomeBodyState extends State<HomeBody> {
         YoutubePlayer.convertUrlToId(youtubeUrlController.text),
         startPosition,
         captionProv.selectedCaptionLanguage?.code,
+        isSmallPhoneHeight(context)
       ],
     );
     setupScreenUtil(context);

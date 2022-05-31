@@ -90,6 +90,7 @@ void setupScreenUtil(BuildContext context) {
 bool isLargePhone(BuildContext context) => MediaQuery.of(context).size.width > 600 ? true : false;
 bool isNormalPhone(BuildContext context) => MediaQuery.of(context).size.width > 400 && MediaQuery.of(context).size.width < 600 ? true : false;
 bool isSmallPhone(BuildContext context) => MediaQuery.of(context).size.width < 400 ? true : false;
+bool isSmallPhoneHeight(BuildContext context) => MediaQuery.of(context).size.height < 700 ? true : false;
 
 /// Setting height and width 
 double setWidth(double width) => ScreenUtil().setWidth(width);

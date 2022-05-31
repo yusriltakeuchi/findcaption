@@ -30,8 +30,10 @@ class RouterGenerator {
             youtubeId: args[0],
             position: args[1],
             language: args[2],
+            isSmallPhoneHeight: args[3],
           ), settings: const RouteSettings(name: routeVideoPlayer));
         }
     }
+    return null;
   }
 }
